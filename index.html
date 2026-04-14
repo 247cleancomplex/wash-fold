@@ -10,7 +10,616 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: #f4f5f7;
+      color: #1a1a1a;<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>24.7ComplexCare — Pickup Scheduling</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #f4f5f7;
       color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .hero {
+      background: #185FA5;
+      padding: 2rem 1.5rem 1.5rem;
+      text-align: center;
+    }
+    .logo { font-size: 24px; font-weight: 600; color: #fff; letter-spacing: -0.5px; }
+    .logo span { color: #85B7EB; }
+    .tagline { font-size: 13px; color: #B5D4F4; margin-top: 5px; }
+
+    .steps { display: flex; justify-content: center; align-items: center; gap: 0; margin-top: 1.5rem; }
+    .step { display: flex; align-items: center; gap: 8px; }
+    .step-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600;
+    }
+    .step.active .step-num { background: #fff; color: #185FA5; }
+    .step.inactive .step-num { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.55); }
+    .step-label { font-size: 12px; }
+    .step.active .step-label { color: rgba(255,255,255,0.95); }
+    .step.inactive .step-label { color: rgba(255,255,255,0.4); }
+    .step-line { width: 36px; height: 1px; background: rgba(255,255,255,0.25); margin: 0 4px; }
+
+    .content { padding: 1.5rem; max-width: 660px; margin: 0 auto; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e5ea;
+      border-radius: 14px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .card-title {
+      font-size: 15px; font-weight: 600;
+      color: #1a1a1a; margin-bottom: 1rem;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .badge {
+      display: inline-block;
+      background: #E6F1FB; color: #0C447C;
+      font-size: 11px; font-weight: 500;
+      padding: 3px 9px; border-radius: 20px;
+    }
+
+    .svc-card {
+      border: 2px solid #378ADD;
+      border-radius: 12px;
+      padding: 1.25rem;
+      background: #EEF6FD;
+    }
+    .svc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .svc-name { font-size: 18px; font-weight: 600; color: #0C447C; }
+    .svc-check {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: #185FA5;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .svc-check svg { width: 13px; height: 13px; }
+
+    .pricing-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .price-box {
+      background: #fff; border-radius: 9px;
+      padding: 12px 14px; border: 1px solid #B5D4F4;
+    }
+    .price-label { font-size: 11px; color: #185FA5; margin-bottom: 4px; }
+    .price-val { font-size: 22px; font-weight: 700; color: #0C447C; }
+    .price-sub { font-size: 11px; color: #378ADD; margin-top: 2px; }
+
+    .info-strip {
+      background: #EAF3DE; border-radius: 9px;
+      padding: 10px 14px; margin-top: 12px;
+      display: flex; align-items: flex-start; gap: 9px;
+    }
+    .info-strip svg { flex-shrink: 0; margin-top: 1px; }
+    .info-strip-text { font-size: 12px; color: #27500A; line-height: 1.55; }
+
+    .field { margin-bottom: 1rem; }
+    .field:last-child { margin-bottom: 0; }
+    .field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%; padding: 10px 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      font-size: 14px; color: #1a1a1a;
+      background: #fff;
+      font-family: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .field select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 36px;
+    }
+    .field textarea { resize: vertical; min-height: 78px; }
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus {
+      outline: none;
+      border-color: #378ADD;
+      box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .days {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      gap: 6px; margin-bottom: 1rem;
+    }
+    .day-btn {
+      border: 1px solid #e2e5ea; border-radius: 9px;
+      padding: 8px 4px; text-align: center;
+      cursor: pointer; transition: all 0.15s;
+      position: relative; user-select: none;
+    }
+    .day-btn:hover { border-color: #a0b4c8; }
+    .day-btn .d-name { font-size: 10px; color: #888; }
+    .day-btn .d-num { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-top: 2px; }
+    .day-btn.selected { border-color: #378ADD; background: #EEF6FD; }
+    .day-btn.selected .d-name { color: #378ADD; }
+    .day-btn.selected .d-num { color: #185FA5; }
+    .day-btn.discount-day { border-color: #639922; background: #EAF3DE; }
+    .day-btn.discount-day .d-name { color: #3B6D11; }
+    .day-btn.discount-day .d-num { color: #27500A; }
+    .day-btn.discount-day.selected { border-color: #3B6D11; background: #C0DD97; }
+    .discount-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: #639922; margin: 3px auto 0;
+    }
+
+    .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
+    .slot {
+      border: 1px solid #e2e5ea; border-radius: 9px;
+      padding: 11px 8px; text-align: center;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      color: #555; transition: all 0.15s;
+    }
+    .slot:hover { border-color: #a0b4c8; color: #1a1a1a; }
+    .slot.selected { border-color: #378ADD; background: #EEF6FD; color: #185FA5; }
+
+    .discount-banner {
+      display: none; background: #EAF3DE;
+      border: 1px solid #97C459; border-radius: 9px;
+      padding: 11px 14px; margin-bottom: 1rem;
+      align-items: center; gap: 10px;
+    }
+    .discount-banner.show { display: flex; }
+    .discount-banner-text { font-size: 13px; color: #27500A; line-height: 1.5; flex: 1; }
+    .discount-banner-text strong { font-weight: 600; }
+    .discount-tag {
+      background: #639922; color: #fff;
+      font-size: 12px; font-weight: 600;
+      padding: 5px 11px; border-radius: 20px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .no-discount-banner {
+      display: none; background: #f8f9fb;
+      border: 1px solid #e2e5ea; border-radius: 9px;
+      padding: 11px 14px; margin-bottom: 1rem;
+    }
+    .no-discount-banner.show { display: block; }
+    .no-discount-text { font-size: 12px; color: #666; line-height: 1.55; }
+
+    .cta {
+      background: #185FA5; color: #fff;
+      border: none; border-radius: 10px;
+      padding: 14px 24px; font-size: 16px;
+      font-weight: 600; width: 100%;
+      cursor: pointer; font-family: inherit;
+      transition: background 0.15s;
+      letter-spacing: -0.2px;
+    }
+    .cta:hover { background: #0C447C; }
+    .cta:active { transform: scale(0.99); }
+    .note { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
+
+    .confirm-screen {
+      display: none; padding: 2.5rem 1.5rem;
+      max-width: 660px; margin: 0 auto; text-align: center;
+    }
+    .check-circle {
+      width: 68px; height: 68px; border-radius: 50%;
+      background: #EAF3DE;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1rem;
+    }
+    .confirm-title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .confirm-sub { font-size: 14px; color: #555; margin-bottom: 1.75rem; line-height: 1.65; }
+    .confirm-details {
+      background: #f8f9fb; border: 1px solid #e2e5ea;
+      border-radius: 12px; padding: 1rem 1.25rem;
+      text-align: left; margin-bottom: 1.5rem;
+    }
+    .confirm-row {
+      display: flex; justify-content: space-between;
+      padding: 7px 0; font-size: 13px;
+      border-bottom: 1px solid #eee;
+    }
+    .confirm-row:last-child { border-bottom: none; }
+    .confirm-row .cr-label { color: #777; }
+    .confirm-row .cr-val { color: #1a1a1a; font-weight: 600; text-align: right; max-width: 60%; }
+    .confirm-row .cr-val.savings { color: #3B6D11; }
+
+    @media (max-width: 480px) {
+      .row { grid-template-columns: 1fr; }
+      .slots { grid-template-columns: 1fr 1fr 1fr; }
+      .day-btn .d-num { font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Hidden iframe absorbs Google Forms redirect silently -->
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+<div id="booking-form">
+  <div class="hero">
+    <div class="logo">24.7<span>ComplexCare</span></div>
+    <div class="tagline">Wash &amp; Fold — Pickup Scheduling</div>
+    <div class="steps">
+      <div class="step active">
+        <div class="step-num">1</div>
+        <div class="step-label">Service</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step inactive">
+        <div class="step-num">2</div>
+        <div class="step-label">Schedule</div>
+      </div>
+      <div class="step-line"></div>
+      <div class="step inactive">
+        <div class="step-num">3</div>
+        <div class="step-label">Details</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- Step 1 -->
+    <div class="card">
+      <div class="card-title">Select your service <span class="badge">Step 1</span></div>
+      <div class="svc-card">
+        <div class="svc-header">
+          <div class="svc-name">Wash &amp; Fold</div>
+          <div class="svc-check">
+            <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <polyline points="2,6.5 5.5,10 11,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <div class="pricing-row">
+          <div class="price-box">
+            <div class="price-label">Rate per pound</div>
+            <div class="price-val">$2.30</div>
+            <div class="price-sub">per lb</div>
+          </div>
+          <div class="price-box">
+            <div class="price-label">Minimum order</div>
+            <div class="price-val">$45.00</div>
+            <div class="price-sub">20 lbs minimum</div>
+          </div>
+        </div>
+        <div class="info-strip">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="8" cy="8" r="7" stroke="#3B6D11" stroke-width="1.3"/>
+            <line x1="8" y1="7" x2="8" y2="11" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="8" cy="5" r="0.9" fill="#3B6D11"/>
+          </svg>
+          <div class="info-strip-text">Orders under 20 lbs are charged at the $45.00 flat minimum. Final weight is confirmed at pickup.</div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:1rem;">
+        <label>Estimated number of bags</label>
+        <select id="bag-count">
+          <option>1 bag</option>
+          <option>2 bags</option>
+          <option>3 bags</option>
+          <option>4+ bags</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="card">
+      <div class="card-title">Choose a pickup date <span class="badge">Step 2</span></div>
+
+      <div class="days" id="day-picker"></div>
+
+      <div id="discount-banner" class="discount-banner">
+        <div style="flex:1;">
+          <div class="discount-banner-text">
+            <strong>Route day match!</strong> Your building is on our <span id="banner-day"></span> route — you save $5.00 on this order.
+          </div>
+        </div>
+        <div class="discount-tag">–$5.00</div>
+      </div>
+
+      <div id="no-discount-banner" class="no-discount-banner">
+        <div class="no-discount-text">
+          This date is not your building's regular route day, but we'll still pick up! Select your route day to save $5.00. <span id="route-day-hint"></span>
+        </div>
+      </div>
+
+      <div style="font-size:13px; color:#666; font-weight:500; margin-bottom:9px;">Choose a pickup window</div>
+      <div class="slots">
+        <div class="slot" onclick="selectSlot(this)">8am–10am</div>
+        <div class="slot selected" onclick="selectSlot(this)">10am–12pm</div>
+        <div class="slot" onclick="selectSlot(this)">12pm–2pm</div>
+      </div>
+
+      <div class="field">
+        <label>Pickup location</label>
+        <select id="location-select" onchange="onLocationChange()">
+          <option value="" disabled selected>— Select your building —</option>
+          <optgroup label="Verona — route day: Monday">
+            <option>Apex at Verona</option>
+            <option>Legacy Apartments</option>
+          </optgroup>
+          <optgroup label="Madison — route day: Tuesday">
+            <option>Ovation 309</option>
+            <option>The Continental</option>
+          </optgroup>
+          <optgroup label="Middleton — route day: Wednesday">
+            <option>The West Edge</option>
+            <option>Heritage Middleton Senior Living</option>
+          </optgroup>
+          <optgroup label="Sun Prairie — route day: Thursday">
+            <option>Essence Estates</option>
+            <option>Springs at Sun Prairie</option>
+          </optgroup>
+          <optgroup label="Fitchburg — route day: Friday">
+            <option>Prima Apartments</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="card">
+      <div class="card-title">Your details <span class="badge">Step 3</span></div>
+      <div class="row">
+        <div class="field"><label>First name</label><input type="text" id="first-name" placeholder="Maria" /></div>
+        <div class="field"><label>Last name</label><input type="text" id="last-name" placeholder="Torres" /></div>
+      </div>
+      <div class="field"><label>Phone number</label><input type="tel" id="phone" placeholder="(555) 000-0000" /></div>
+      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@email.com" /></div>
+      <div class="field"><label>Unit / apartment number</label><input type="text" id="unit" placeholder="Apt 4B" /></div>
+      <div class="field"><label>Special instructions (optional)</label><textarea id="instructions" placeholder="Gate code, leave at door, fragrance-free detergent, etc."></textarea></div>
+    </div>
+
+    <button class="cta" onclick="submitForm()">Confirm Pickup Appointment</button>
+    <div class="note">We'll follow up to confirm your appointment details.</div>
+  </div>
+</div>
+
+<!-- Confirmation Screen -->
+<div class="confirm-screen" id="confirm-screen">
+  <div class="check-circle">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="17" cy="17" r="16" stroke="#3B6D11" stroke-width="1.5"/>
+      <polyline points="10,17 15,22 24,12" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="confirm-title">Pickup scheduled!</div>
+  <div class="confirm-sub">Thanks! Your appointment has been received.<br>We'll see you on your pickup day!</div>
+  <div class="confirm-details">
+    <div class="confirm-row"><span class="cr-label">Service</span><span class="cr-val">Wash &amp; Fold</span></div>
+    <div class="confirm-row"><span class="cr-label">Rate</span><span class="cr-val">$2.30 / lb (min. $45.00)</span></div>
+    <div class="confirm-row"><span class="cr-label">Date</span><span class="cr-val" id="c-date">—</span></div>
+    <div class="confirm-row"><span class="cr-label">Pickup window</span><span class="cr-val" id="c-slot">10am–12pm</span></div>
+    <div class="confirm-row"><span class="cr-label">Pickup location</span><span class="cr-val" id="c-location">—</span></div>
+    <div class="confirm-row"><span class="cr-label">Bags</span><span class="cr-val" id="c-bags">1 bag</span></div>
+    <div class="confirm-row" id="c-discount-row" style="display:none;">
+      <span class="cr-label">Route day discount</span>
+      <span class="cr-val savings">–$5.00 applied</span>
+    </div>
+  </div>
+  <button class="cta" onclick="resetForm()" style="background:#f0f2f5; color:#1a1a1a; border:1px solid #d1d5db;">
+    Book another pickup
+  </button>
+</div>
+
+<script>
+  // ── Google Forms endpoint & field IDs (extracted from your prefill URL) ──
+  const GF_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfM27l09XYUJ37z6ylqP9kigyUMm9E_Vhk6aY2rY0-Ah8U84Q/formResponse';
+  const FIELDS = {
+    firstName    : 'entry.176020513',
+    lastName     : 'entry.206444612',
+    phone        : 'entry.1891842389',
+    email        : 'entry.235385815',
+    unit         : 'entry.2054015500',
+    date         : 'entry.1599903416',
+    window       : 'entry.24158841',
+    location     : 'entry.1819967504',
+    bags         : 'entry.685609467',
+    instructions : 'entry.1366107006',
+    discount     : 'entry.1969460687'
+  };
+
+  // ── Route day config ──
+  const cityRouteDay  = { Verona: 1, Madison: 2, Middleton: 3, 'Sun Prairie': 4, Fitchburg: 5 };
+  const cityRouteName = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' };
+  const dayNames      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  let selectedDate = null;
+  let selectedCity = null;
+  let hasDiscount  = false;
+
+  const today  = new Date();
+  const picker = document.getElementById('day-picker');
+
+  function buildCalendar() {
+    picker.innerHTML = '';
+    for (let i = 0; i < 7; i++) {
+      const d   = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dow = d.getDay();
+      const btn = document.createElement('div');
+      btn.className   = 'day-btn';
+      btn.dataset.dow = dow;
+      btn.innerHTML   =
+        '<div class="d-name">' + dayNames[dow] + '</div>' +
+        '<div class="d-num">'  + d.getDate()   + '</div>';
+      btn.addEventListener('click', () => selectDay(btn, d));
+      if (i === 1) selectDay(btn, d);
+      picker.appendChild(btn);
+    }
+  }
+
+  function selectDay(btn, d) {
+    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedDate = d;
+    document.getElementById('c-date').textContent =
+      d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    evaluateDiscount();
+  }
+
+  function highlightRouteDays() {
+    document.querySelectorAll('.day-btn').forEach(btn => {
+      btn.classList.remove('discount-day');
+      const dot = btn.querySelector('.discount-dot');
+      if (dot) dot.remove();
+    });
+    if (!selectedCity) return;
+    const routeDow = cityRouteDay[selectedCity];
+    document.querySelectorAll('.day-btn').forEach(btn => {
+      if (parseInt(btn.dataset.dow) === routeDow) {
+        btn.classList.add('discount-day');
+        const dot = document.createElement('div');
+        dot.className = 'discount-dot';
+        btn.appendChild(dot);
+      }
+    });
+  }
+
+  function onLocationChange() {
+    const sel    = document.getElementById('location-select');
+    const opt    = sel.options[sel.selectedIndex];
+    selectedCity = opt.parentElement.label.split(' —')[0];
+    document.getElementById('c-location').textContent = sel.value;
+    highlightRouteDays();
+    evaluateDiscount();
+  }
+
+  function evaluateDiscount() {
+    const banner   = document.getElementById('discount-banner');
+    const noBanner = document.getElementById('no-discount-banner');
+    if (!selectedCity || !selectedDate) {
+      banner.classList.remove('show');
+      noBanner.classList.remove('show');
+      return;
+    }
+    const routeDow     = cityRouteDay[selectedCity];
+    const routeDayName = cityRouteName[routeDow];
+    const selectedDow  = selectedDate.getDay();
+    if (selectedDow === routeDow) {
+      hasDiscount = true;
+      document.getElementById('banner-day').textContent = routeDayName;
+      banner.classList.add('show');
+      noBanner.classList.remove('show');
+    } else {
+      hasDiscount = false;
+      document.getElementById('route-day-hint').textContent = 'Your route day is ' + routeDayName + '.';
+      banner.classList.remove('show');
+      noBanner.classList.add('show');
+    }
+  }
+
+  function selectSlot(el) {
+    document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('c-slot').textContent = el.textContent.trim();
+  }
+
+  function getSelectedSlot() {
+    const sel = document.querySelector('.slot.selected');
+    return sel ? sel.textContent.trim() : '';
+  }
+
+  function submitForm() {
+    const loc       = document.getElementById('location-select').value;
+    const firstName = document.getElementById('first-name').value.trim();
+    const lastName  = document.getElementById('last-name').value.trim();
+    const phone     = document.getElementById('phone').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const unit      = document.getElementById('unit').value.trim();
+
+    if (!firstName || !lastName) { alert('Please enter your first and last name.'); return; }
+    if (!phone)                  { alert('Please enter your phone number.'); return; }
+    if (!email)                  { alert('Please enter your email address.'); return; }
+    if (!unit)                   { alert('Please enter your unit / apartment number.'); return; }
+    if (!loc)                    { alert('Please select a pickup location.'); return; }
+    if (!selectedDate)           { alert('Please select a pickup date.'); return; }
+
+    const dateStr    = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    const slotStr    = getSelectedSlot();
+    const bags       = document.getElementById('bag-count').value;
+    const notes      = document.getElementById('instructions').value.trim();
+    const discountStr = hasDiscount ? 'Yes – $5.00' : 'No';
+
+    // Build and silently submit a hidden form to Google Forms
+    const form = document.createElement('form');
+    form.method  = 'POST';
+    form.action  = GF_ACTION;
+    form.target  = 'hidden_iframe';
+    form.style.display = 'none';
+
+    const data = {
+      [FIELDS.firstName]    : firstName,
+      [FIELDS.lastName]     : lastName,
+      [FIELDS.phone]        : phone,
+      [FIELDS.email]        : email,
+      [FIELDS.unit]         : unit,
+      [FIELDS.date]         : dateStr,
+      [FIELDS.window]       : slotStr,
+      [FIELDS.location]     : loc,
+      [FIELDS.bags]         : bags,
+      [FIELDS.instructions] : notes,
+      [FIELDS.discount]     : discountStr
+    };
+
+    Object.entries(data).forEach(([name, value]) => {
+      const input = document.createElement('input');
+      input.type  = 'hidden';
+      input.name  = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+
+    // Update and show confirmation screen
+    document.getElementById('c-date').textContent     = dateStr;
+    document.getElementById('c-slot').textContent     = slotStr;
+    document.getElementById('c-location').textContent = loc;
+    document.getElementById('c-bags').textContent     = bags;
+    document.getElementById('c-discount-row').style.display = hasDiscount ? 'flex' : 'none';
+    document.getElementById('booking-form').style.display   = 'none';
+    document.getElementById('confirm-screen').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    selectedCity = null;
+    hasDiscount  = false;
+    document.getElementById('location-select').selectedIndex = 0;
+    document.getElementById('discount-banner').classList.remove('show');
+    document.getElementById('no-discount-banner').classList.remove('show');
+    document.getElementById('first-name').value   = '';
+    document.getElementById('last-name').value    = '';
+    document.getElementById('phone').value        = '';
+    document.getElementById('email').value        = '';
+    document.getElementById('unit').value         = '';
+    document.getElementById('instructions').value = '';
+    document.getElementById('bag-count').selectedIndex = 0;
+    document.getElementById('booking-form').style.display   = 'block';
+    document.getElementById('confirm-screen').style.display = 'none';
+    buildCalendar();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  buildCalendar();
+</script>
+</body>
+</html>
+
       min-height: 100vh;
     }
 
