@@ -192,6 +192,7 @@
     }
     .cta:hover { background: #0C447C; }
     .cta:active { transform: scale(0.99); }
+    .cta:disabled { background: #a0b4c8; cursor: not-allowed; transform: none; }
     .note { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
 
     .confirm-screen {
@@ -229,9 +230,6 @@
   </style>
 </head>
 <body>
-
-<!-- Hidden iframe absorbs Google Forms redirect silently -->
-<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
 
 <div id="booking-form">
   <div class="hero">
@@ -369,7 +367,7 @@
       <div class="field"><label>Special instructions (optional)</label><textarea id="instructions" placeholder="Gate code, leave at door, fragrance-free detergent, etc."></textarea></div>
     </div>
 
-    <button class="cta" onclick="submitForm()">Confirm Pickup Appointment</button>
+    <button class="cta" id="submit-btn" onclick="submitForm()">Confirm Pickup Appointment</button>
     <div class="note">We'll follow up to confirm your appointment details.</div>
   </div>
 </div>
@@ -402,54 +400,41 @@
 </div>
 
 <script>
-  // ── Google Forms endpoint & field IDs (extracted from your prefill URL) ──
-  const GF_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSfM27l09XYUJ37z6ylqP9kigyUMm9E_Vhk6aY2rY0-Ah8U84Q/formResponse';
-  const FIELDS = {
-    firstName    : 'entry.176020513',
-    lastName     : 'entry.206444612',
-    phone        : 'entry.1891842389',
-    email        : 'entry.235385815',
-    unit         : 'entry.2054015500',
-    date         : 'entry.1599903416',
-    window       : 'entry.24158841',
-    location     : 'entry.1819967504',
-    bags         : 'entry.685609467',
-    instructions : 'entry.1366107006',
-    discount     : 'entry.1969460687'
-  };
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNBz6QcF2t7B0hC9jvKJk3VobVrxayVrNaxOgvgVOPs470VKzWjrr6_Mf35ak2wM0G/exec';
 
-  // ── Route day config ──
-  const cityRouteDay  = { Verona: 1, Madison: 2, Middleton: 3, 'Sun Prairie': 4, Fitchburg: 5 };
-  const cityRouteName = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' };
-  const dayNames      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var cityRouteDay  = { Verona: 1, Madison: 2, Middleton: 3, 'Sun Prairie': 4, Fitchburg: 5 };
+  var cityRouteName = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' };
+  var dayNames      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  let selectedDate = null;
-  let selectedCity = null;
-  let hasDiscount  = false;
+  var selectedDate = null;
+  var selectedCity = null;
+  var hasDiscount  = false;
 
-  const today  = new Date();
-  const picker = document.getElementById('day-picker');
+  var today  = new Date();
+  var picker = document.getElementById('day-picker');
 
   function buildCalendar() {
     picker.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
-      const d   = new Date(today);
-      d.setDate(today.getDate() + i);
-      const dow = d.getDay();
-      const btn = document.createElement('div');
-      btn.className   = 'day-btn';
-      btn.dataset.dow = dow;
-      btn.innerHTML   =
-        '<div class="d-name">' + dayNames[dow] + '</div>' +
-        '<div class="d-num">'  + d.getDate()   + '</div>';
-      btn.addEventListener('click', () => selectDay(btn, d));
-      if (i === 1) selectDay(btn, d);
-      picker.appendChild(btn);
+    for (var i = 0; i < 7; i++) {
+      (function(i) {
+        var d   = new Date(today);
+        d.setDate(today.getDate() + i);
+        var dow = d.getDay();
+        var btn = document.createElement('div');
+        btn.className   = 'day-btn';
+        btn.dataset.dow = dow;
+        btn.innerHTML   =
+          '<div class="d-name">' + dayNames[dow] + '</div>' +
+          '<div class="d-num">'  + d.getDate()   + '</div>';
+        btn.addEventListener('click', function() { selectDay(btn, d); });
+        if (i === 1) selectDay(btn, d);
+        picker.appendChild(btn);
+      })(i);
     }
   }
 
   function selectDay(btn, d) {
-    document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+    document.querySelectorAll('.day-btn').forEach(function(b) { b.classList.remove('selected'); });
     btn.classList.add('selected');
     selectedDate = d;
     document.getElementById('c-date').textContent =
@@ -458,17 +443,17 @@
   }
 
   function highlightRouteDays() {
-    document.querySelectorAll('.day-btn').forEach(btn => {
+    document.querySelectorAll('.day-btn').forEach(function(btn) {
       btn.classList.remove('discount-day');
-      const dot = btn.querySelector('.discount-dot');
+      var dot = btn.querySelector('.discount-dot');
       if (dot) dot.remove();
     });
     if (!selectedCity) return;
-    const routeDow = cityRouteDay[selectedCity];
-    document.querySelectorAll('.day-btn').forEach(btn => {
+    var routeDow = cityRouteDay[selectedCity];
+    document.querySelectorAll('.day-btn').forEach(function(btn) {
       if (parseInt(btn.dataset.dow) === routeDow) {
         btn.classList.add('discount-day');
-        const dot = document.createElement('div');
+        var dot = document.createElement('div');
         dot.className = 'discount-dot';
         btn.appendChild(dot);
       }
@@ -476,8 +461,8 @@
   }
 
   function onLocationChange() {
-    const sel    = document.getElementById('location-select');
-    const opt    = sel.options[sel.selectedIndex];
+    var sel    = document.getElementById('location-select');
+    var opt    = sel.options[sel.selectedIndex];
     selectedCity = opt.parentElement.label.split(' —')[0];
     document.getElementById('c-location').textContent = sel.value;
     highlightRouteDays();
@@ -485,16 +470,16 @@
   }
 
   function evaluateDiscount() {
-    const banner   = document.getElementById('discount-banner');
-    const noBanner = document.getElementById('no-discount-banner');
+    var banner   = document.getElementById('discount-banner');
+    var noBanner = document.getElementById('no-discount-banner');
     if (!selectedCity || !selectedDate) {
       banner.classList.remove('show');
       noBanner.classList.remove('show');
       return;
     }
-    const routeDow     = cityRouteDay[selectedCity];
-    const routeDayName = cityRouteName[routeDow];
-    const selectedDow  = selectedDate.getDay();
+    var routeDow     = cityRouteDay[selectedCity];
+    var routeDayName = cityRouteName[routeDow];
+    var selectedDow  = selectedDate.getDay();
     if (selectedDow === routeDow) {
       hasDiscount = true;
       document.getElementById('banner-day').textContent = routeDayName;
@@ -509,23 +494,23 @@
   }
 
   function selectSlot(el) {
-    document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+    document.querySelectorAll('.slot').forEach(function(s) { s.classList.remove('selected'); });
     el.classList.add('selected');
     document.getElementById('c-slot').textContent = el.textContent.trim();
   }
 
   function getSelectedSlot() {
-    const sel = document.querySelector('.slot.selected');
+    var sel = document.querySelector('.slot.selected');
     return sel ? sel.textContent.trim() : '';
   }
 
   function submitForm() {
-    const loc       = document.getElementById('location-select').value;
-    const firstName = document.getElementById('first-name').value.trim();
-    const lastName  = document.getElementById('last-name').value.trim();
-    const phone     = document.getElementById('phone').value.trim();
-    const email     = document.getElementById('email').value.trim();
-    const unit      = document.getElementById('unit').value.trim();
+    var loc       = document.getElementById('location-select').value;
+    var firstName = document.getElementById('first-name').value.trim();
+    var lastName  = document.getElementById('last-name').value.trim();
+    var phone     = document.getElementById('phone').value.trim();
+    var email     = document.getElementById('email').value.trim();
+    var unit      = document.getElementById('unit').value.trim();
 
     if (!firstName || !lastName) { alert('Please enter your first and last name.'); return; }
     if (!phone)                  { alert('Please enter your phone number.'); return; }
@@ -534,46 +519,52 @@
     if (!loc)                    { alert('Please select a pickup location.'); return; }
     if (!selectedDate)           { alert('Please select a pickup date.'); return; }
 
-    const dateStr    = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-    const slotStr    = getSelectedSlot();
-    const bags       = document.getElementById('bag-count').value;
-    const notes      = document.getElementById('instructions').value.trim();
-    const discountStr = hasDiscount ? 'Yes – $5.00' : 'No';
+    var dateStr     = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    var slotStr     = getSelectedSlot();
+    var bags        = document.getElementById('bag-count').value;
+    var notes       = document.getElementById('instructions').value.trim();
+    var discountStr = hasDiscount ? 'Yes – $5.00' : 'No';
 
-    // Build and silently submit a hidden form to Google Forms
-    const form = document.createElement('form');
-    form.method  = 'POST';
-    form.action  = GF_ACTION;
-    form.target  = 'hidden_iframe';
-    form.style.display = 'none';
+    // Disable button and show loading state
+    var btn = document.getElementById('submit-btn');
+    btn.disabled    = true;
+    btn.textContent = 'Submitting…';
 
-    const data = {
-      [FIELDS.firstName]    : firstName,
-      [FIELDS.lastName]     : lastName,
-      [FIELDS.phone]        : phone,
-      [FIELDS.email]        : email,
-      [FIELDS.unit]         : unit,
-      [FIELDS.date]         : dateStr,
-      [FIELDS.window]       : slotStr,
-      [FIELDS.location]     : loc,
-      [FIELDS.bags]         : bags,
-      [FIELDS.instructions] : notes,
-      [FIELDS.discount]     : discountStr
-    };
-
-    Object.entries(data).forEach(([name, value]) => {
-      const input = document.createElement('input');
-      input.type  = 'hidden';
-      input.name  = name;
-      input.value = value;
-      form.appendChild(input);
+    // Build URL-encoded payload
+    var params = new URLSearchParams({
+      firstName    : firstName,
+      lastName     : lastName,
+      phone        : phone,
+      email        : email,
+      unit         : unit,
+      date         : dateStr,
+      window       : slotStr,
+      location     : loc,
+      bags         : bags,
+      instructions : notes,
+      discount     : discountStr
     });
 
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    // POST to Google Apps Script — no-cors mode required for cross-origin
+    fetch(SCRIPT_URL, {
+      method : 'POST',
+      mode   : 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body   : params.toString()
+    })
+    .then(function() {
+      // no-cors always returns opaque response — treat any response as success
+      showConfirmation(dateStr, slotStr, loc, bags);
+    })
+    .catch(function(err) {
+      console.error('Submission error:', err);
+      alert('Something went wrong. Please try again or contact us directly.');
+      btn.disabled    = false;
+      btn.textContent = 'Confirm Pickup Appointment';
+    });
+  }
 
-    // Update and show confirmation screen
+  function showConfirmation(dateStr, slotStr, loc, bags) {
     document.getElementById('c-date').textContent     = dateStr;
     document.getElementById('c-slot').textContent     = slotStr;
     document.getElementById('c-location').textContent = loc;
@@ -597,6 +588,9 @@
     document.getElementById('unit').value         = '';
     document.getElementById('instructions').value = '';
     document.getElementById('bag-count').selectedIndex = 0;
+    var btn = document.getElementById('submit-btn');
+    btn.disabled    = false;
+    btn.textContent = 'Confirm Pickup Appointment';
     document.getElementById('booking-form').style.display   = 'block';
     document.getElementById('confirm-screen').style.display = 'none';
     buildCalendar();
