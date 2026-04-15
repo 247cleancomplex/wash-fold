@@ -3,292 +3,748 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>24.7ComplexCare — Pickup Scheduling</title>
+  <title>24.7ComplexCare — Schedule a Pickup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --navy:       #0a1628;
+      --blue:       #1a4fd6;
+      --blue-mid:   #2563eb;
+      --blue-light: #dbeafe;
+      --blue-pale:  #eff6ff;
+      --green:      #059669;
+      --green-light:#d1fae5;
+      --amber:      #d97706;
+      --amber-light:#fef3c7;
+      --red:        #dc2626;
+      --surface:    #ffffff;
+      --surface-2:  #f8fafc;
+      --surface-3:  #f1f5f9;
+      --border:     #e2e8f0;
+      --border-2:   #cbd5e1;
+      --text-1:     #0f172a;
+      --text-2:     #475569;
+      --text-3:     #94a3b8;
+      --radius-sm:  8px;
+      --radius-md:  14px;
+      --radius-lg:  20px;
+      --radius-xl:  28px;
+      --shadow-sm:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md:  0 4px 16px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+      --shadow-lg:  0 20px 48px rgba(0,0,0,0.10), 0 8px 16px rgba(0,0,0,0.06);
+      --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #f4f5f7;
-      color: #1a1a1a;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--surface-2);
+      color: var(--text-1);
       min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
     }
 
+    /* ── HERO HEADER ── */
     .hero {
-      background: #185FA5;
-      padding: 2rem 1.5rem 1.5rem;
+      background: var(--navy);
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% -10%, rgba(37,99,235,0.45) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 80% at -10% 80%, rgba(26,79,214,0.3) 0%, transparent 60%);
+    }
+    .hero-grid {
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-inner {
+      position: relative; z-index: 1;
+      padding: 2.5rem 1.5rem 2rem;
       text-align: center;
+      max-width: 660px;
+      margin: 0 auto;
     }
-    .logo { font-size: 24px; font-weight: 600; color: #fff; letter-spacing: -0.5px; }
-    .logo span { color: #85B7EB; }
-    .tagline { font-size: 13px; color: #B5D4F4; margin-top: 5px; }
-
-    .steps { display: flex; justify-content: center; align-items: center; gap: 0; margin-top: 1.5rem; }
-    .step { display: flex; align-items: center; gap: 8px; }
-    .step-num {
-      width: 28px; height: 28px; border-radius: 50%;
+    .logo-lockup {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.25rem;
+    }
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--blue-mid);
+      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 13px; font-weight: 600;
     }
-    .step.active .step-num { background: #fff; color: #185FA5; }
-    .step.inactive .step-num { background: rgba(255,255,255,0.2); color: rgba(255,255,255,0.55); }
-    .step-label { font-size: 12px; }
-    .step.active .step-label { color: rgba(255,255,255,0.95); }
-    .step.inactive .step-label { color: rgba(255,255,255,0.4); }
-    .step-line { width: 36px; height: 1px; background: rgba(255,255,255,0.25); margin: 0 4px; }
+    .logo-icon svg { width: 22px; height: 22px; }
+    .logo-text {
+      font-family: 'DM Serif Display', serif;
+      font-size: 22px;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+    .logo-text span { color: #93c5fd; }
+    .hero-headline {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(28px, 5vw, 38px);
+      color: #fff;
+      line-height: 1.15;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.5px;
+    }
+    .hero-headline em { color: #93c5fd; font-style: italic; }
+    .hero-sub {
+      font-size: 15px;
+      color: #94a3b8;
+      font-weight: 300;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
 
-    .content { padding: 1.5rem; max-width: 660px; margin: 0 auto; }
+    /* ── PROGRESS STEPS ── */
+    .progress-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+      padding: 1.25rem 0 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 0.6rem 1rem;
+      border-radius: 30px;
+      transition: var(--transition);
+    }
+    .step-item.active { background: rgba(255,255,255,0.08); }
+    .step-bubble {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 600;
+      transition: var(--transition);
+      flex-shrink: 0;
+    }
+    .step-item.active .step-bubble { background: var(--blue-mid); color: #fff; }
+    .step-item.done .step-bubble { background: var(--green); color: #fff; }
+    .step-item.inactive .step-bubble { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.35); }
+    .step-label-text { font-size: 12px; font-weight: 500; }
+    .step-item.active .step-label-text { color: #fff; }
+    .step-item.done .step-label-text { color: #86efac; }
+    .step-item.inactive .step-label-text { color: rgba(255,255,255,0.3); }
+    .step-connector { width: 28px; height: 1px; background: rgba(255,255,255,0.1); flex-shrink: 0; }
 
+    /* ── PRICE PILL ── */
+    .price-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 30px;
+      padding: 8px 20px;
+      margin-bottom: 1.5rem;
+    }
+    .price-pill-item { text-align: center; }
+    .price-pill-val { font-size: 18px; font-weight: 600; color: #fff; }
+    .price-pill-label { font-size: 10px; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+    .price-pill-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.1); }
+
+    /* ── MAIN CONTENT ── */
+    .content {
+      padding: 1.5rem;
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    /* ── SECTION LABEL ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-3);
+      margin-bottom: 0.6rem;
+      padding-left: 2px;
+    }
+
+    /* ── CARDS ── */
     .card {
-      background: #fff;
-      border: 1px solid #e2e5ea;
-      border-radius: 14px;
-      padding: 1.25rem 1.5rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
       margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition);
     }
-    .card-title {
-      font-size: 15px; font-weight: 600;
-      color: #1a1a1a; margin-bottom: 1rem;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .badge {
-      display: inline-block;
-      background: #E6F1FB; color: #0C447C;
-      font-size: 11px; font-weight: 500;
-      padding: 3px 9px; border-radius: 20px;
-    }
+    .card:hover { box-shadow: var(--shadow-md); }
 
-    .svc-card {
-      border: 2px solid #378ADD;
-      border-radius: 12px;
+    /* ── SERVICE CARD ── */
+    .service-showcase {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
       padding: 1.25rem;
-      background: #EEF6FD;
+      background: linear-gradient(135deg, var(--blue-pale) 0%, #fff 100%);
+      border: 1.5px solid var(--blue-light);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
     }
-    .svc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-    .svc-name { font-size: 18px; font-weight: 600; color: #0C447C; }
-    .svc-check {
-      width: 24px; height: 24px; border-radius: 50%;
-      background: #185FA5;
+    .service-icon-wrap {
+      width: 48px; height: 48px;
+      background: var(--blue-mid);
+      border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
     }
-    .svc-check svg { width: 13px; height: 13px; }
-
-    .pricing-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .price-box {
-      background: #fff; border-radius: 9px;
-      padding: 12px 14px; border: 1px solid #B5D4F4;
+    .service-icon-wrap svg { width: 24px; height: 24px; }
+    .service-info { flex: 1; }
+    .service-name { font-size: 17px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+    .service-tagline { font-size: 13px; color: var(--text-2); }
+    .service-badge {
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+      align-self: flex-start;
     }
-    .price-label { font-size: 11px; color: #185FA5; margin-bottom: 4px; }
-    .price-val { font-size: 22px; font-weight: 700; color: #0C447C; }
-    .price-sub { font-size: 11px; color: #378ADD; margin-top: 2px; }
 
-    .info-strip {
-      background: #EAF3DE; border-radius: 9px;
-      padding: 10px 14px; margin-top: 12px;
-      display: flex; align-items: flex-start; gap: 9px;
+    .pricing-tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1rem; }
+    .pricing-tile {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      text-align: center;
+      transition: var(--transition);
     }
-    .info-strip svg { flex-shrink: 0; margin-top: 1px; }
-    .info-strip-text { font-size: 12px; color: #27500A; line-height: 1.55; }
+    .pricing-tile:hover { border-color: var(--blue-mid); background: var(--blue-pale); }
+    .tile-label { font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .tile-value { font-size: 26px; font-weight: 700; color: var(--navy); font-family: 'DM Serif Display', serif; }
+    .tile-sub { font-size: 11px; color: var(--text-3); margin-top: 3px; }
 
-    .field { margin-bottom: 1rem; }
+    .info-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-light);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+    }
+    .info-chip svg { flex-shrink: 0; }
+    .info-chip-text { font-size: 12px; color: #065f46; line-height: 1.5; }
+
+    /* ── FIELD ── */
+    .field { margin-bottom: 1.1rem; }
     .field:last-child { margin-bottom: 0; }
-    .field label { display: block; font-size: 13px; color: #555; margin-bottom: 6px; font-weight: 500; }
+    .field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-2);
+      margin-bottom: 7px;
+    }
     .field input,
     .field select,
     .field textarea {
-      width: 100%; padding: 10px 13px;
-      border: 1px solid #d1d5db;
-      border-radius: 9px;
-      font-size: 14px; color: #1a1a1a;
-      background: #fff;
-      font-family: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      color: var(--text-1);
+      background: var(--surface);
+      font-family: 'DM Sans', sans-serif;
+      transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
       appearance: none;
       -webkit-appearance: none;
     }
     .field select {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
       background-repeat: no-repeat;
-      background-position: right 13px center;
-      padding-right: 36px;
+      background-position: right 14px center;
+      padding-right: 38px;
+      cursor: pointer;
     }
-    .field textarea { resize: vertical; min-height: 78px; }
+    .field textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
+    .field input:hover,
+    .field select:hover { border-color: var(--border-2); }
     .field input:focus,
     .field select:focus,
     .field textarea:focus {
       outline: none;
-      border-color: #378ADD;
-      box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      background: var(--blue-pale);
     }
-    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field input::placeholder,
+    .field textarea::placeholder { color: var(--text-3); }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .days {
-      display: grid; grid-template-columns: repeat(7, 1fr);
-      gap: 6px; margin-bottom: 1rem;
+    /* ── CALENDAR ── */
+    .cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+    }
+    .cal-month { font-size: 14px; font-weight: 600; color: var(--text-1); }
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 1.25rem;
     }
     .day-btn {
-      border: 1px solid #e2e5ea; border-radius: 9px;
-      padding: 8px 4px; text-align: center;
-      cursor: pointer; transition: all 0.15s;
-      position: relative; user-select: none;
+      aspect-ratio: 1;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      background: var(--surface);
+      user-select: none;
+      gap: 1px;
     }
-    .day-btn:hover { border-color: #a0b4c8; }
-    .day-btn .d-name { font-size: 10px; color: #888; }
-    .day-btn .d-num { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-top: 2px; }
-    .day-btn.selected { border-color: #378ADD; background: #EEF6FD; }
-    .day-btn.selected .d-name { color: #378ADD; }
-    .day-btn.selected .d-num { color: #185FA5; }
-    .day-btn.discount-day { border-color: #639922; background: #EAF3DE; }
-    .day-btn.discount-day .d-name { color: #3B6D11; }
-    .day-btn.discount-day .d-num { color: #27500A; }
-    .day-btn.discount-day.selected { border-color: #3B6D11; background: #C0DD97; }
-    .discount-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: #639922; margin: 3px auto 0;
+    .day-btn:hover { border-color: var(--blue-mid); background: var(--blue-pale); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .day-name { font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-3); }
+    .day-num  { font-size: 16px; font-weight: 600; color: var(--text-1); }
+    .day-btn.selected { border-color: var(--blue-mid); background: var(--blue-mid); box-shadow: 0 4px 12px rgba(37,99,235,0.3); transform: translateY(-1px); }
+    .day-btn.selected .day-name { color: rgba(255,255,255,0.7); }
+    .day-btn.selected .day-num  { color: #fff; }
+    .day-btn.discount-day { border-color: var(--green); background: var(--green-light); }
+    .day-btn.discount-day .day-name { color: #065f46; }
+    .day-btn.discount-day .day-num  { color: #065f46; }
+    .day-btn.discount-day:hover { background: #a7f3d0; transform: translateY(-1px); }
+    .day-btn.discount-day.selected { border-color: var(--green); background: var(--green); box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+    .day-btn.discount-day.selected .day-name,
+    .day-btn.discount-day.selected .day-num { color: #fff; }
+    .discount-pip {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--green);
+      position: absolute;
+      bottom: 4px;
+    }
+    .day-btn.selected .discount-pip { background: rgba(255,255,255,0.7); }
+
+    /* ── DISCOUNT BANNERS ── */
+    .discount-win {
+      display: none;
+      align-items: center;
+      gap: 12px;
+      background: var(--green-light);
+      border: 1.5px solid #6ee7b7;
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      margin-bottom: 1.25rem;
+      animation: slideDown 0.3s cubic-bezier(0.4,0,0.2,1);
+    }
+    .discount-win.show { display: flex; }
+    .discount-win-icon {
+      width: 36px; height: 36px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .discount-win-icon svg { width: 18px; height: 18px; }
+    .discount-win-text { flex: 1; }
+    .discount-win-title { font-size: 13px; font-weight: 600; color: #065f46; margin-bottom: 2px; }
+    .discount-win-sub { font-size: 12px; color: #047857; }
+    .discount-pill {
+      background: var(--green);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
     }
 
-    .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1.25rem; }
-    .slot {
-      border: 1px solid #e2e5ea; border-radius: 9px;
-      padding: 11px 8px; text-align: center;
-      cursor: pointer; font-size: 13px; font-weight: 500;
-      color: #555; transition: all 0.15s;
+    .no-discount-note {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--amber-light);
+      border: 1px solid #fde68a;
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      margin-bottom: 1.25rem;
+      animation: slideDown 0.3s cubic-bezier(0.4,0,0.2,1);
     }
-    .slot:hover { border-color: #a0b4c8; color: #1a1a1a; }
-    .slot.selected { border-color: #378ADD; background: #EEF6FD; color: #185FA5; }
+    .no-discount-note.show { display: flex; }
+    .no-discount-note svg { flex-shrink: 0; }
+    .no-discount-note-text { font-size: 12px; color: #92400e; line-height: 1.5; }
+    .no-discount-note-text strong { font-weight: 600; }
 
-    .discount-banner {
-      display: none; background: #EAF3DE;
-      border: 1px solid #97C459; border-radius: 9px;
-      padding: 11px 14px; margin-bottom: 1rem;
-      align-items: center; gap: 10px;
-    }
-    .discount-banner.show { display: flex; }
-    .discount-banner-text { font-size: 13px; color: #27500A; line-height: 1.5; flex: 1; }
-    .discount-banner-text strong { font-weight: 600; }
-    .discount-tag {
-      background: #639922; color: #fff;
-      font-size: 12px; font-weight: 600;
-      padding: 5px 11px; border-radius: 20px;
-      white-space: nowrap; flex-shrink: 0;
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .no-discount-banner {
-      display: none; background: #f8f9fb;
-      border: 1px solid #e2e5ea; border-radius: 9px;
-      padding: 11px 14px; margin-bottom: 1rem;
+    /* ── TIME SLOTS ── */
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 1.25rem;
     }
-    .no-discount-banner.show { display: block; }
-    .no-discount-text { font-size: 12px; color: #666; line-height: 1.55; }
+    .slot-btn {
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition);
+      background: var(--surface);
+      position: relative;
+      overflow: hidden;
+    }
+    .slot-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: var(--blue-mid);
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .slot-btn:hover { border-color: var(--blue-mid); transform: translateY(-1px); box-shadow: var(--shadow-sm); }
+    .slot-btn.selected { border-color: var(--blue-mid); background: var(--blue-mid); }
+    .slot-time {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-2);
+      position: relative; z-index: 1;
+      transition: color var(--transition);
+    }
+    .slot-period {
+      font-size: 10px;
+      color: var(--text-3);
+      margin-top: 2px;
+      position: relative; z-index: 1;
+      transition: color var(--transition);
+    }
+    .slot-btn.selected .slot-time,
+    .slot-btn.selected .slot-period { color: #fff; }
+    .slot-btn:hover:not(.selected) .slot-time { color: var(--blue-mid); }
 
-    .cta {
-      background: #185FA5; color: #fff;
-      border: none; border-radius: 10px;
-      padding: 14px 24px; font-size: 16px;
-      font-weight: 600; width: 100%;
-      cursor: pointer; font-family: inherit;
-      transition: background 0.15s;
+    /* ── SECTION DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.25rem 0;
+    }
+
+    /* ── SUBMIT BUTTON ── */
+    .submit-wrap { margin-top: 0.25rem; }
+    .btn-submit {
+      width: 100%;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-md);
+      padding: 16px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden;
       letter-spacing: -0.2px;
     }
-    .cta:hover { background: #0C447C; }
-    .cta:active { transform: scale(0.99); }
-    .cta:disabled { background: #a0b4c8; cursor: not-allowed; transform: none; }
-    .note { font-size: 12px; color: #999; text-align: center; margin-top: 10px; }
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 60%);
+    }
+    .btn-submit:hover:not(:disabled) { background: #1e3a6e; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(10,22,40,0.3); }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { background: var(--text-3); cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-submit svg { width: 18px; height: 18px; flex-shrink: 0; }
+    .btn-arrow { transition: transform var(--transition); }
+    .btn-submit:hover:not(:disabled) .btn-arrow { transform: translateX(3px); }
 
-    .confirm-screen {
-      display: none; padding: 2.5rem 1.5rem;
-      max-width: 660px; margin: 0 auto; text-align: center;
+    .submit-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-3);
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
-    .check-circle {
-      width: 68px; height: 68px; border-radius: 50%;
-      background: #EAF3DE;
+
+    /* ── CONFIRM SCREEN ── */
+    #confirm-screen {
+      display: none;
+      min-height: 100vh;
+      background: var(--surface-2);
+    }
+    .confirm-hero {
+      background: var(--navy);
+      padding: 3rem 1.5rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .confirm-hero-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 70% at 50% 120%, rgba(5,150,105,0.4) 0%, transparent 60%);
+    }
+    .confirm-check {
+      width: 72px; height: 72px;
+      background: var(--green);
+      border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
+      margin: 0 auto 1.25rem;
+      position: relative; z-index: 1;
+      box-shadow: 0 0 0 12px rgba(5,150,105,0.15), 0 0 0 24px rgba(5,150,105,0.07);
+      animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
     }
-    .confirm-title { font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
-    .confirm-sub { font-size: 14px; color: #555; margin-bottom: 1.75rem; line-height: 1.65; }
-    .confirm-details {
-      background: #f8f9fb; border: 1px solid #e2e5ea;
-      border-radius: 12px; padding: 1rem 1.25rem;
-      text-align: left; margin-bottom: 1.5rem;
+    .confirm-check svg { width: 36px; height: 36px; }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
     }
+    .confirm-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 30px;
+      color: #fff;
+      margin-bottom: 8px;
+      position: relative; z-index: 1;
+    }
+    .confirm-sub { font-size: 14px; color: #94a3b8; position: relative; z-index: 1; line-height: 1.6; }
+
+    .confirm-card {
+      background: var(--surface);
+      border-radius: var(--radius-xl) var(--radius-xl) var(--radius-lg) var(--radius-lg);
+      margin: -1.5rem 1rem 1rem;
+      padding: 1.75rem 1.5rem;
+      box-shadow: var(--shadow-lg);
+      position: relative; z-index: 2;
+    }
+    .confirm-card-title { font-size: 13px; font-weight: 600; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 1rem; }
     .confirm-row {
-      display: flex; justify-content: space-between;
-      padding: 7px 0; font-size: 13px;
-      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
     }
     .confirm-row:last-child { border-bottom: none; }
-    .confirm-row .cr-label { color: #777; }
-    .confirm-row .cr-val { color: #1a1a1a; font-weight: 600; text-align: right; max-width: 60%; }
-    .confirm-row .cr-val.savings { color: #3B6D11; }
+    .confirm-row-label { font-size: 13px; color: var(--text-2); flex-shrink: 0; }
+    .confirm-row-val { font-size: 13px; font-weight: 600; color: var(--text-1); text-align: right; }
+    .confirm-row-val.savings { color: var(--green); }
 
+    .confirm-email-note {
+      background: var(--blue-pale);
+      border: 1px solid var(--blue-light);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .confirm-email-note svg { flex-shrink: 0; }
+    .confirm-email-note-text { font-size: 12px; color: #1e40af; line-height: 1.5; }
+
+    .btn-reset {
+      width: 100%;
+      background: var(--surface);
+      color: var(--text-1);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all var(--transition);
+      margin: 0 1rem;
+      width: calc(100% - 2rem);
+    }
+    .btn-reset:hover { background: var(--surface-3); border-color: var(--border-2); }
+
+    /* ── LOADING SPINNER ── */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--navy);
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 999;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ── RESPONSIVE ── */
     @media (max-width: 480px) {
-      .row { grid-template-columns: 1fr; }
-      .slots { grid-template-columns: 1fr 1fr 1fr; }
-      .day-btn .d-num { font-size: 13px; }
+      .row-2 { grid-template-columns: 1fr; }
+      .pricing-tiles { grid-template-columns: 1fr 1fr; }
+      .day-num { font-size: 14px; }
+      .confirm-card { margin: -1.5rem 0.5rem 1rem; padding: 1.5rem 1.25rem; }
     }
   </style>
 </head>
 <body>
 
+<div id="toast" class="toast"></div>
+
+<!-- ══════════════ BOOKING FORM ══════════════ -->
 <div id="booking-form">
+
   <div class="hero">
-    <div class="logo">24.7<span>ComplexCare</span></div>
-    <div class="tagline">Wash &amp; Fold — Pickup Scheduling</div>
-    <div class="steps">
-      <div class="step active">
-        <div class="step-num">1</div>
-        <div class="step-label">Service</div>
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="hero-inner">
+
+      <div class="logo-lockup">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 7C3 5.9 3.9 5 5 5h14c1.1 0 2 .9 2 2v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V7z" stroke="#fff" stroke-width="1.5"/>
+            <path d="M8 12h8M8 9h4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="17" cy="17" r="4" fill="#059669"/>
+            <path d="M15.5 17l1 1 2-2" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="logo-text">24.7<span>ComplexCare</span></div>
       </div>
-      <div class="step-line"></div>
-      <div class="step inactive">
-        <div class="step-num">2</div>
-        <div class="step-label">Schedule</div>
+
+      <h1 class="hero-headline">Fresh laundry,<br><em>delivered back to you.</em></h1>
+      <p class="hero-sub">Schedule your wash &amp; fold pickup in under 2 minutes.</p>
+
+      <div class="price-pill">
+        <div class="price-pill-item">
+          <div class="price-pill-val">$2.30</div>
+          <div class="price-pill-label">per pound</div>
+        </div>
+        <div class="price-pill-divider"></div>
+        <div class="price-pill-item">
+          <div class="price-pill-val">$45</div>
+          <div class="price-pill-label">minimum</div>
+        </div>
+        <div class="price-pill-divider"></div>
+        <div class="price-pill-item">
+          <div class="price-pill-val">–$5</div>
+          <div class="price-pill-label">route discount</div>
+        </div>
       </div>
-      <div class="step-line"></div>
-      <div class="step inactive">
-        <div class="step-num">3</div>
-        <div class="step-label">Details</div>
+
+      <div class="progress-bar">
+        <div class="step-item active" id="prog-1">
+          <div class="step-bubble">1</div>
+          <div class="step-label-text">Service</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item inactive" id="prog-2">
+          <div class="step-bubble">2</div>
+          <div class="step-label-text">Schedule</div>
+        </div>
+        <div class="step-connector"></div>
+        <div class="step-item inactive" id="prog-3">
+          <div class="step-bubble">3</div>
+          <div class="step-label-text">Details</div>
+        </div>
       </div>
+
     </div>
   </div>
 
   <div class="content">
 
-    <!-- Step 1 -->
+    <!-- ── STEP 1 ── -->
+    <div class="section-label">Step 1 — Service</div>
     <div class="card">
-      <div class="card-title">Select your service <span class="badge">Step 1</span></div>
-      <div class="svc-card">
-        <div class="svc-header">
-          <div class="svc-name">Wash &amp; Fold</div>
-          <div class="svc-check">
-            <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <polyline points="2,6.5 5.5,10 11,3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-        </div>
-        <div class="pricing-row">
-          <div class="price-box">
-            <div class="price-label">Rate per pound</div>
-            <div class="price-val">$2.30</div>
-            <div class="price-sub">per lb</div>
-          </div>
-          <div class="price-box">
-            <div class="price-label">Minimum order</div>
-            <div class="price-val">$45.00</div>
-            <div class="price-sub">20 lbs minimum</div>
-          </div>
-        </div>
-        <div class="info-strip">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="8" cy="8" r="7" stroke="#3B6D11" stroke-width="1.3"/>
-            <line x1="8" y1="7" x2="8" y2="11" stroke="#3B6D11" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="8" cy="5" r="0.9" fill="#3B6D11"/>
+      <div class="service-showcase">
+        <div class="service-icon-wrap">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2h12l1 6H5L6 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M5 8c0 7 2 12 7 14 5-2 7-7 7-14" stroke="#fff" stroke-width="1.5"/>
+            <path d="M9 14l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
-          <div class="info-strip-text">Orders under 20 lbs are charged at the $45.00 flat minimum. Final weight is confirmed at pickup.</div>
+        </div>
+        <div class="service-info">
+          <div class="service-name">Wash &amp; Fold</div>
+          <div class="service-tagline">Picked up, cleaned, and returned fresh</div>
+        </div>
+        <div class="service-badge">Selected</div>
+      </div>
+
+      <div class="pricing-tiles">
+        <div class="pricing-tile">
+          <div class="tile-label">Per pound</div>
+          <div class="tile-value">$2.30</div>
+          <div class="tile-sub">weight confirmed at pickup</div>
+        </div>
+        <div class="pricing-tile">
+          <div class="tile-label">Minimum order</div>
+          <div class="tile-value">$45</div>
+          <div class="tile-sub">equals 20 lbs</div>
         </div>
       </div>
-      <div class="field" style="margin-top:1rem;">
+
+      <div class="info-chip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#059669" stroke-width="1.3"/>
+          <line x1="8" y1="7" x2="8" y2="11" stroke="#059669" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="5" r="0.9" fill="#059669"/>
+        </svg>
+        <span class="info-chip-text">Orders under 20 lbs are billed at the $45.00 flat minimum. Final weight confirmed at pickup.</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="field">
         <label>Estimated number of bags</label>
         <select id="bag-count">
           <option>1 bag</option>
@@ -299,32 +755,50 @@
       </div>
     </div>
 
-    <!-- Step 2 -->
+    <!-- ── STEP 2 ── -->
+    <div class="section-label">Step 2 — Schedule</div>
     <div class="card">
-      <div class="card-title">Choose a pickup date <span class="badge">Step 2</span></div>
 
-      <div class="days" id="day-picker"></div>
+      <div class="cal-header">
+        <div class="cal-month" id="cal-month"></div>
+        <div style="font-size:12px; color:var(--text-3);">Next 7 days</div>
+      </div>
+      <div class="days-grid" id="day-picker"></div>
 
-      <div id="discount-banner" class="discount-banner">
-        <div style="flex:1;">
-          <div class="discount-banner-text">
-            <strong>Route day match!</strong> Your building is on our <span id="banner-day"></span> route — you save $5.00 on this order.
-          </div>
+      <div id="discount-win" class="discount-win">
+        <div class="discount-win-icon">
+          <svg viewBox="0 0 18 18" fill="none"><path d="M9 2l1.8 3.6L15 6.4l-3 2.9.7 4.1L9 11.5l-3.7 1.9.7-4.1-3-2.9 4.2-.8L9 2z" fill="#fff"/></svg>
         </div>
-        <div class="discount-tag">–$5.00</div>
+        <div class="discount-win-text">
+          <div class="discount-win-title">Route day — $5 discount applied!</div>
+          <div class="discount-win-sub">Your building is on our <span id="banner-day"></span> route.</div>
+        </div>
+        <div class="discount-pill">–$5.00</div>
       </div>
 
-      <div id="no-discount-banner" class="no-discount-banner">
-        <div class="no-discount-text">
-          This date is not your building's regular route day, but we'll still pick up! Select your route day to save $5.00. <span id="route-day-hint"></span>
-        </div>
+      <div id="no-discount-note" class="no-discount-note">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <circle cx="8" cy="8" r="7" stroke="#d97706" stroke-width="1.3"/>
+          <line x1="8" y1="5" x2="8" y2="9" stroke="#d97706" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="8" cy="11" r="0.9" fill="#d97706"/>
+        </svg>
+        <div class="no-discount-note-text">Not your route day — we still pick up! <strong><span id="route-day-hint"></span></strong> to save $5.00.</div>
       </div>
 
-      <div style="font-size:13px; color:#666; font-weight:500; margin-bottom:9px;">Choose a pickup window</div>
-      <div class="slots">
-        <div class="slot" onclick="selectSlot(this)">8am–10am</div>
-        <div class="slot selected" onclick="selectSlot(this)">10am–12pm</div>
-        <div class="slot" onclick="selectSlot(this)">12pm–2pm</div>
+      <div style="font-size:13px; font-weight:600; color:var(--text-2); margin-bottom:10px;">Pickup window</div>
+      <div class="slots-grid">
+        <div class="slot-btn" onclick="selectSlot(this)">
+          <div class="slot-time">8am – 10am</div>
+          <div class="slot-period">Morning</div>
+        </div>
+        <div class="slot-btn selected" onclick="selectSlot(this)">
+          <div class="slot-time">10am – 12pm</div>
+          <div class="slot-period">Mid-morning</div>
+        </div>
+        <div class="slot-btn" onclick="selectSlot(this)">
+          <div class="slot-time">12pm – 2pm</div>
+          <div class="slot-period">Afternoon</div>
+        </div>
       </div>
 
       <div class="field">
@@ -354,67 +828,111 @@
       </div>
     </div>
 
-    <!-- Step 3 -->
+    <!-- ── STEP 3 ── -->
+    <div class="section-label">Step 3 — Your details</div>
     <div class="card">
-      <div class="card-title">Your details <span class="badge">Step 3</span></div>
-      <div class="row">
-        <div class="field"><label>First name</label><input type="text" id="first-name" placeholder="Maria" /></div>
-        <div class="field"><label>Last name</label><input type="text" id="last-name" placeholder="Torres" /></div>
+      <div class="row-2">
+        <div class="field"><label>First name</label><input type="text" id="first-name" placeholder="Maria" autocomplete="given-name" /></div>
+        <div class="field"><label>Last name</label><input type="text" id="last-name" placeholder="Torres" autocomplete="family-name" /></div>
       </div>
-      <div class="field"><label>Phone number</label><input type="tel" id="phone" placeholder="(555) 000-0000" /></div>
-      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@email.com" /></div>
+      <div class="field"><label>Phone number</label><input type="tel" id="phone" placeholder="(555) 000-0000" autocomplete="tel" /></div>
+      <div class="field"><label>Email address</label><input type="email" id="email" placeholder="you@email.com" autocomplete="email" /></div>
       <div class="field"><label>Unit / apartment number</label><input type="text" id="unit" placeholder="Apt 4B" /></div>
-      <div class="field"><label>Special instructions (optional)</label><textarea id="instructions" placeholder="Gate code, leave at door, fragrance-free detergent, etc."></textarea></div>
+      <div class="field"><label>Special instructions <span style="color:var(--text-3); font-weight:400;">(optional)</span></label><textarea id="instructions" placeholder="Gate code, fragrance-free detergent, leave at door..."></textarea></div>
     </div>
 
-    <button class="cta" id="submit-btn" onclick="submitForm()">Confirm Pickup Appointment</button>
-    <div class="note">We'll follow up to confirm your appointment details.</div>
+    <!-- ── SUBMIT ── -->
+    <div class="submit-wrap">
+      <button class="btn-submit" id="submit-btn" onclick="submitForm()">
+        <span id="btn-label">Confirm Pickup Appointment</span>
+        <div class="spinner" id="btn-spinner"></div>
+        <svg class="btn-arrow" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M10 4l5 5-5 5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="submit-note">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1a5.5 5.5 0 100 11A5.5 5.5 0 006.5 1z" stroke="#94a3b8" stroke-width="1.1"/><path d="M6.5 6v3M6.5 4.5v.5" stroke="#94a3b8" stroke-width="1.1" stroke-linecap="round"/></svg>
+        Confirmation will be sent to your email
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- Confirmation Screen -->
-<div class="confirm-screen" id="confirm-screen">
-  <div class="check-circle">
-    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="17" cy="17" r="16" stroke="#3B6D11" stroke-width="1.5"/>
-      <polyline points="10,17 15,22 24,12" stroke="#3B6D11" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
+<!-- ══════════════ CONFIRM SCREEN ══════════════ -->
+<div id="confirm-screen">
+  <div class="confirm-hero">
+    <div class="confirm-hero-bg"></div>
+    <div class="confirm-check">
+      <svg viewBox="0 0 36 36" fill="none">
+        <polyline points="8,18 15,25 28,11" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="confirm-title">You're all set!</div>
+    <div class="confirm-sub">Your pickup has been scheduled.<br>Check your email for confirmation details.</div>
   </div>
-  <div class="confirm-title">Pickup scheduled!</div>
-  <div class="confirm-sub">Thanks! Your appointment has been received.<br>We'll see you on your pickup day!</div>
-  <div class="confirm-details">
-    <div class="confirm-row"><span class="cr-label">Service</span><span class="cr-val">Wash &amp; Fold</span></div>
-    <div class="confirm-row"><span class="cr-label">Rate</span><span class="cr-val">$2.30 / lb (min. $45.00)</span></div>
-    <div class="confirm-row"><span class="cr-label">Date</span><span class="cr-val" id="c-date">—</span></div>
-    <div class="confirm-row"><span class="cr-label">Pickup window</span><span class="cr-val" id="c-slot">10am–12pm</span></div>
-    <div class="confirm-row"><span class="cr-label">Pickup location</span><span class="cr-val" id="c-location">—</span></div>
-    <div class="confirm-row"><span class="cr-label">Bags</span><span class="cr-val" id="c-bags">1 bag</span></div>
+
+  <div class="confirm-card">
+    <div class="confirm-card-title">Booking summary</div>
+
+    <div class="confirm-row">
+      <span class="confirm-row-label">Service</span>
+      <span class="confirm-row-val">Wash &amp; Fold</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-row-label">Rate</span>
+      <span class="confirm-row-val">$2.30 / lb (min. $45)</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-row-label">Date</span>
+      <span class="confirm-row-val" id="c-date">—</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-row-label">Window</span>
+      <span class="confirm-row-val" id="c-slot">—</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-row-label">Location</span>
+      <span class="confirm-row-val" id="c-location">—</span>
+    </div>
+    <div class="confirm-row">
+      <span class="confirm-row-label">Bags</span>
+      <span class="confirm-row-val" id="c-bags">—</span>
+    </div>
     <div class="confirm-row" id="c-discount-row" style="display:none;">
-      <span class="cr-label">Route day discount</span>
-      <span class="cr-val savings">–$5.00 applied</span>
+      <span class="confirm-row-label">Route discount</span>
+      <span class="confirm-row-val savings">–$5.00 applied ✓</span>
+    </div>
+
+    <div class="confirm-email-note">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+        <rect x="2" y="4" width="14" height="10" rx="2" stroke="#1d4ed8" stroke-width="1.3"/>
+        <path d="M2 6l7 5 7-5" stroke="#1d4ed8" stroke-width="1.3"/>
+      </svg>
+      <div class="confirm-email-note-text">A confirmation email has been sent to you and our team has been notified of your booking.</div>
     </div>
   </div>
-  <button class="cta" onclick="resetForm()" style="background:#f0f2f5; color:#1a1a1a; border:1px solid #d1d5db;">
-    Book another pickup
-  </button>
+
+  <button class="btn-reset" onclick="resetForm()">Schedule another pickup</button>
+  <div style="height:2rem;"></div>
 </div>
 
 <script>
-  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxNBz6QcF2t7B0hC9jvKJk3VobVrxayVrNaxOgvgVOPs470VKzWjrr6_Mf35ak2wM0G/exec';
+  var SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyoYbLOgIo52gr5Iw93dZjQZcZhXc4RmRKKZLSpw9F7uUDa0ofiBr5SFI1dmrJf1U6P/exec';
 
   var cityRouteDay  = { Verona: 1, Madison: 2, Middleton: 3, 'Sun Prairie': 4, Fitchburg: 5 };
-  var cityRouteName = { 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday' };
-  var dayNames      = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var cityRouteName = { 1:'Monday', 2:'Tuesday', 3:'Wednesday', 4:'Thursday', 5:'Friday' };
+  var dayNames      = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var monthNames    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
   var selectedDate = null;
   var selectedCity = null;
   var hasDiscount  = false;
+  var today        = new Date();
 
-  var today  = new Date();
-  var picker = document.getElementById('day-picker');
-
+  /* ── Calendar ── */
   function buildCalendar() {
+    var picker = document.getElementById('day-picker');
     picker.innerHTML = '';
+    document.getElementById('cal-month').textContent = monthNames[today.getMonth()] + ' ' + today.getFullYear();
     for (var i = 0; i < 7; i++) {
       (function(i) {
         var d   = new Date(today);
@@ -423,9 +941,7 @@
         var btn = document.createElement('div');
         btn.className   = 'day-btn';
         btn.dataset.dow = dow;
-        btn.innerHTML   =
-          '<div class="d-name">' + dayNames[dow] + '</div>' +
-          '<div class="d-num">'  + d.getDate()   + '</div>';
+        btn.innerHTML   = '<div class="day-name">' + dayNames[dow] + '</div><div class="day-num">' + d.getDate() + '</div>';
         btn.addEventListener('click', function() { selectDay(btn, d); });
         if (i === 1) selectDay(btn, d);
         picker.appendChild(btn);
@@ -438,31 +954,31 @@
     btn.classList.add('selected');
     selectedDate = d;
     document.getElementById('c-date').textContent =
-      d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+      d.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
     evaluateDiscount();
   }
 
   function highlightRouteDays() {
     document.querySelectorAll('.day-btn').forEach(function(btn) {
       btn.classList.remove('discount-day');
-      var dot = btn.querySelector('.discount-dot');
-      if (dot) dot.remove();
+      var pip = btn.querySelector('.discount-pip');
+      if (pip) pip.remove();
     });
     if (!selectedCity) return;
     var routeDow = cityRouteDay[selectedCity];
     document.querySelectorAll('.day-btn').forEach(function(btn) {
       if (parseInt(btn.dataset.dow) === routeDow) {
         btn.classList.add('discount-day');
-        var dot = document.createElement('div');
-        dot.className = 'discount-dot';
-        btn.appendChild(dot);
+        var pip = document.createElement('div');
+        pip.className = 'discount-pip';
+        btn.appendChild(pip);
       }
     });
   }
 
   function onLocationChange() {
-    var sel    = document.getElementById('location-select');
-    var opt    = sel.options[sel.selectedIndex];
+    var sel  = document.getElementById('location-select');
+    var opt  = sel.options[sel.selectedIndex];
     selectedCity = opt.parentElement.label.split(' —')[0];
     document.getElementById('c-location').textContent = sel.value;
     highlightRouteDays();
@@ -470,40 +986,50 @@
   }
 
   function evaluateDiscount() {
-    var banner   = document.getElementById('discount-banner');
-    var noBanner = document.getElementById('no-discount-banner');
+    var win      = document.getElementById('discount-win');
+    var note     = document.getElementById('no-discount-note');
+    var hintSpan = document.getElementById('route-day-hint');
     if (!selectedCity || !selectedDate) {
-      banner.classList.remove('show');
-      noBanner.classList.remove('show');
+      win.classList.remove('show');
+      note.classList.remove('show');
       return;
     }
     var routeDow     = cityRouteDay[selectedCity];
     var routeDayName = cityRouteName[routeDow];
-    var selectedDow  = selectedDate.getDay();
-    if (selectedDow === routeDow) {
+    var selDow       = selectedDate.getDay();
+    if (selDow === routeDow) {
       hasDiscount = true;
       document.getElementById('banner-day').textContent = routeDayName;
-      banner.classList.add('show');
-      noBanner.classList.remove('show');
+      win.classList.add('show');
+      note.classList.remove('show');
     } else {
       hasDiscount = false;
-      document.getElementById('route-day-hint').textContent = 'Your route day is ' + routeDayName + '.';
-      banner.classList.remove('show');
-      noBanner.classList.add('show');
+      hintSpan.textContent = 'Switch to ' + routeDayName;
+      win.classList.remove('show');
+      note.classList.add('show');
     }
   }
 
   function selectSlot(el) {
-    document.querySelectorAll('.slot').forEach(function(s) { s.classList.remove('selected'); });
+    document.querySelectorAll('.slot-btn').forEach(function(s) { s.classList.remove('selected'); });
     el.classList.add('selected');
-    document.getElementById('c-slot').textContent = el.textContent.trim();
+    document.getElementById('c-slot').textContent = el.querySelector('.slot-time').textContent.trim();
   }
 
   function getSelectedSlot() {
-    var sel = document.querySelector('.slot.selected');
+    var sel = document.querySelector('.slot-btn.selected .slot-time');
     return sel ? sel.textContent.trim() : '';
   }
 
+  /* ── Toast ── */
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 3000);
+  }
+
+  /* ── Submit ── */
   function submitForm() {
     var loc       = document.getElementById('location-select').value;
     var firstName = document.getElementById('first-name').value.trim();
@@ -512,25 +1038,26 @@
     var email     = document.getElementById('email').value.trim();
     var unit      = document.getElementById('unit').value.trim();
 
-    if (!firstName || !lastName) { alert('Please enter your first and last name.'); return; }
-    if (!phone)                  { alert('Please enter your phone number.'); return; }
-    if (!email)                  { alert('Please enter your email address.'); return; }
-    if (!unit)                   { alert('Please enter your unit / apartment number.'); return; }
-    if (!loc)                    { alert('Please select a pickup location.'); return; }
-    if (!selectedDate)           { alert('Please select a pickup date.'); return; }
+    if (!firstName || !lastName) { showToast('Please enter your full name.'); return; }
+    if (!phone)                  { showToast('Please enter your phone number.'); return; }
+    if (!email || !email.includes('@')) { showToast('Please enter a valid email address.'); return; }
+    if (!unit)                   { showToast('Please enter your unit number.'); return; }
+    if (!loc)                    { showToast('Please select your pickup location.'); return; }
+    if (!selectedDate)           { showToast('Please select a pickup date.'); return; }
 
-    var dateStr     = selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+    var dateStr     = selectedDate.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
     var slotStr     = getSelectedSlot();
     var bags        = document.getElementById('bag-count').value;
     var notes       = document.getElementById('instructions').value.trim();
     var discountStr = hasDiscount ? 'Yes – $5.00' : 'No';
 
-    // Disable button and show loading state
-    var btn = document.getElementById('submit-btn');
-    btn.disabled    = true;
-    btn.textContent = 'Submitting…';
+    var btn     = document.getElementById('submit-btn');
+    var label   = document.getElementById('btn-label');
+    var spinner = document.getElementById('btn-spinner');
+    btn.disabled      = true;
+    label.textContent = 'Submitting…';
+    spinner.style.display = 'block';
 
-    // Build URL-encoded payload
     var params = new URLSearchParams({
       firstName    : firstName,
       lastName     : lastName,
@@ -545,52 +1072,47 @@
       discount     : discountStr
     });
 
-    // POST to Google Apps Script — no-cors mode required for cross-origin
     fetch(SCRIPT_URL, {
-      method : 'POST',
-      mode   : 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body   : params.toString()
+      method  : 'POST',
+      mode    : 'no-cors',
+      headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body    : params.toString()
     })
     .then(function() {
-      // no-cors always returns opaque response — treat any response as success
-      showConfirmation(dateStr, slotStr, loc, bags);
+      document.getElementById('c-date').textContent     = dateStr;
+      document.getElementById('c-slot').textContent     = slotStr;
+      document.getElementById('c-location').textContent = loc;
+      document.getElementById('c-bags').textContent     = bags;
+      document.getElementById('c-discount-row').style.display = hasDiscount ? 'flex' : 'none';
+      document.getElementById('booking-form').style.display   = 'none';
+      document.getElementById('confirm-screen').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     })
     .catch(function(err) {
-      console.error('Submission error:', err);
-      alert('Something went wrong. Please try again or contact us directly.');
-      btn.disabled    = false;
-      btn.textContent = 'Confirm Pickup Appointment';
+      console.error(err);
+      showToast('Something went wrong. Please try again.');
+      btn.disabled          = false;
+      label.textContent     = 'Confirm Pickup Appointment';
+      spinner.style.display = 'none';
     });
   }
 
-  function showConfirmation(dateStr, slotStr, loc, bags) {
-    document.getElementById('c-date').textContent     = dateStr;
-    document.getElementById('c-slot').textContent     = slotStr;
-    document.getElementById('c-location').textContent = loc;
-    document.getElementById('c-bags').textContent     = bags;
-    document.getElementById('c-discount-row').style.display = hasDiscount ? 'flex' : 'none';
-    document.getElementById('booking-form').style.display   = 'none';
-    document.getElementById('confirm-screen').style.display = 'block';
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
+  /* ── Reset ── */
   function resetForm() {
     selectedCity = null;
     hasDiscount  = false;
-    document.getElementById('location-select').selectedIndex = 0;
-    document.getElementById('discount-banner').classList.remove('show');
-    document.getElementById('no-discount-banner').classList.remove('show');
-    document.getElementById('first-name').value   = '';
-    document.getElementById('last-name').value    = '';
-    document.getElementById('phone').value        = '';
-    document.getElementById('email').value        = '';
-    document.getElementById('unit').value         = '';
-    document.getElementById('instructions').value = '';
-    document.getElementById('bag-count').selectedIndex = 0;
+    ['location-select','bag-count'].forEach(function(id) {
+      document.getElementById(id).selectedIndex = 0;
+    });
+    ['first-name','last-name','phone','email','unit','instructions'].forEach(function(id) {
+      document.getElementById(id).value = '';
+    });
+    document.getElementById('discount-win').classList.remove('show');
+    document.getElementById('no-discount-note').classList.remove('show');
     var btn = document.getElementById('submit-btn');
-    btn.disabled    = false;
-    btn.textContent = 'Confirm Pickup Appointment';
+    btn.disabled = false;
+    document.getElementById('btn-label').textContent = 'Confirm Pickup Appointment';
+    document.getElementById('btn-spinner').style.display = 'none';
     document.getElementById('booking-form').style.display   = 'block';
     document.getElementById('confirm-screen').style.display = 'none';
     buildCalendar();
