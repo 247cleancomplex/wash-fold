@@ -926,7 +926,7 @@ footer{
         <div class="sheet-steps">
           <div class="sheet-step active" id="sp1">
             <div class="sheet-step-bubble">1</div>
-            <div class="sheet-step-label">Service</div>
+            <div class="sheet-step-label">Location</div>
           </div>
           <div class="sheet-step-line"></div>
           <div class="sheet-step inactive" id="sp2">
@@ -940,8 +940,9 @@ footer{
           </div>
         </div>
 
-        <!-- Step 1 -->
-        <div class="form-section-title">Service &amp; bags</div>
+        <!-- Step 1 — Location & service -->
+        <div class="form-section-title">Your building &amp; service</div>
+
         <div style="background:var(--teal-pale);border:1.5px solid var(--teal-light);border-radius:var(--r-md);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:1rem;">
           <div style="width:40px;height:40px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M6 2h12l1 6H5L6 2z" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/><path d="M5 8c0 7 2 12 7 14 5-2 7-7 7-14" stroke="#fff" stroke-width="1.5"/><path d="M9 14l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -952,6 +953,39 @@ footer{
           </div>
           <div style="background:var(--teal);color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">Selected</div>
         </div>
+
+        <div class="field">
+          <label>Pickup location</label>
+          <select id="location-select" onchange="onLocationChange()">
+            <option value="" disabled selected>— Select your building —</option>
+            <optgroup label="Verona — route day: Monday">
+              <option>Apex at Verona</option>
+              <option>Legacy Apartments</option>
+            </optgroup>
+            <optgroup label="Madison — route day: Tuesday">
+              <option>Ovation 309</option>
+              <option>The Continental</option>
+            </optgroup>
+            <optgroup label="Middleton — route day: Wednesday">
+              <option>The West Edge</option>
+              <option>Heritage Middleton Senior Living</option>
+            </optgroup>
+            <optgroup label="Sun Prairie — route day: Thursday">
+              <option>Essence Estates</option>
+              <option>Springs at Sun Prairie</option>
+            </optgroup>
+            <optgroup label="Fitchburg — route day: Friday">
+              <option>Prima Apartments</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <!-- Route day hint shown right after location is selected, before calendar -->
+        <div id="route-day-callout" style="display:none;background:var(--ink);border-radius:var(--r-md);padding:12px 16px;margin-bottom:0;display:none;align-items:center;gap:10px;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0"><circle cx="8" cy="8" r="7" stroke="#5cd8c8" stroke-width="1.3"/><path d="M8 5v4M8 11v.5" stroke="#5cd8c8" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);line-height:1.5">Your route day is <strong style="color:#5cd8c8" id="callout-day"></strong> — pick that day below to save <strong style="color:#5cd8c8">$5.00</strong> off your order.</div>
+        </div>
+
         <div class="field">
           <label>Estimated bags</label>
           <select id="bag-count">
@@ -964,8 +998,8 @@ footer{
 
         <div class="form-divider"></div>
 
-        <!-- Step 2 -->
-        <div class="form-section-title">Date &amp; location</div>
+        <!-- Step 2 — Date & window -->
+        <div class="form-section-title">Pick a date &amp; time</div>
         <div class="cal-label">Select a pickup date</div>
         <div class="days-grid" id="day-picker"></div>
 
@@ -998,32 +1032,6 @@ footer{
             <div class="slot-time">12pm – 2pm</div>
             <div class="slot-period">Afternoon</div>
           </div>
-        </div>
-
-        <div class="field">
-          <label>Pickup location</label>
-          <select id="location-select" onchange="onLocationChange()">
-            <option value="" disabled selected>— Select your building —</option>
-            <optgroup label="Verona — route day: Monday">
-              <option>Apex at Verona</option>
-              <option>Legacy Apartments</option>
-            </optgroup>
-            <optgroup label="Madison — route day: Tuesday">
-              <option>Ovation 309</option>
-              <option>The Continental</option>
-            </optgroup>
-            <optgroup label="Middleton — route day: Wednesday">
-              <option>The West Edge</option>
-              <option>Heritage Middleton Senior Living</option>
-            </optgroup>
-            <optgroup label="Sun Prairie — route day: Thursday">
-              <option>Essence Estates</option>
-              <option>Springs at Sun Prairie</option>
-            </optgroup>
-            <optgroup label="Fitchburg — route day: Friday">
-              <option>Prima Apartments</option>
-            </optgroup>
-          </select>
         </div>
 
         <div class="form-divider"></div>
@@ -1165,7 +1173,14 @@ function onLocationChange(){
   var opt=sel.options[sel.selectedIndex];
   selectedCity=opt.parentElement.label.split(' —')[0];
   document.getElementById('c-location').textContent=sel.value;
-  highlightRouteDays();evaluateDiscount();
+  var rd=cityRouteDay[selectedCity];
+  var rdn=cityRouteName[rd];
+  var callout=document.getElementById('route-day-callout');
+  document.getElementById('callout-day').textContent=rdn;
+  callout.style.display='flex';
+  callout.style.marginBottom='1rem';
+  highlightRouteDays();
+  evaluateDiscount();
 }
 
 function evaluateDiscount(){
@@ -1251,6 +1266,8 @@ function resetForm(){
   ['first-name','last-name','phone','email','unit','instructions'].forEach(function(id){document.getElementById(id).value='';});
   document.getElementById('disc-win').classList.remove('show');
   document.getElementById('disc-note').classList.remove('show');
+  var callout=document.getElementById('route-day-callout');
+  if(callout){callout.style.display='none';}
   document.getElementById('submit-btn').disabled=false;
   document.getElementById('btn-label').textContent='Confirm pickup appointment';
   document.getElementById('btn-spinner').style.display='none';
